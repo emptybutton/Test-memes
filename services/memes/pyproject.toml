@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "test-bot"
+version = "0.1.0"
+description = ""
+authors = ["emptybutton <88573504+emptybutton@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+typenv = "^0.2.0"
+sqlalchemy = "^2.0.31"
+alembic = "^1.13.2"
+asyncpg = "^0.29.0"
+aiohttp = "^3.9.5"
+fastapi = "^0.111.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.2"
+pytest-asyncio = "^0.23.8"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
