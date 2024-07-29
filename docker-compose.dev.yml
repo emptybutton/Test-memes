@@ -19,7 +19,7 @@ services:
       POSTGRES_PASSWORD: root
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
-      POSTGRES_ECHO: false
+      POSTGRES_ECHO: true
     depends_on:
       - postgres
       - media
@@ -34,9 +34,10 @@ services:
     networks:
       - main-network
     environment:
-      MINIO_SERVER: minio
+      MINIO_SERVER: minio:9000
       MINIO_ACCESS_KEY: access-key
       MINIO_SECRET_KEY: secret-key
+      MINIO_SSL: false
     depends_on:
       - minio
 
@@ -50,6 +51,8 @@ services:
       - main-network
     ports:
       - 80:80
+    depends_on:
+      - memes
 
   postgres:
     image: postgres:alpine

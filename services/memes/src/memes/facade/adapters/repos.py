@@ -22,7 +22,7 @@ class DBMemes(repos.Memes):
             image_name=meme.image_name,
         )
 
-        await self.session.execute(stmt)
+        await self.__session.execute(stmt)
 
     async def find_by_id(self, id: UUID) -> entities.Meme | None:
         query = (
@@ -34,7 +34,7 @@ class DBMemes(repos.Memes):
             .limit(1)
         )
 
-        results = await self.session.execute(query)
+        results = await self.__session.execute(query)
         raw_meme = results.first()
 
         if raw_meme is None:
@@ -57,7 +57,7 @@ class DBMemes(repos.Memes):
             .limit(self.__page_size)
         )
 
-        results = await self.session.execute(query)
+        results = await self.__session.execute(query)
 
         for result in results.all():
             yield self.__meme_of(result)
@@ -79,8 +79,8 @@ class DBMemes(repos.Memes):
             )
         )
 
-        await self.session.execute(stmt)
+        await self.__session.execute(stmt)
 
     async def remove(self, meme: entities.Meme) -> None:
-        stmt = delete(tables.Meme).where(tables.Meme == meme.id)
-        await self.session.execute(stmt)
+        stmt = delete(tables.Meme).where(tables.Meme.id == meme.id)
+        await self.__session.execute(stmt)

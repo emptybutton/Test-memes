@@ -14,4 +14,4 @@ RUN poetry install --no-root
 COPY . .
 
 ENTRYPOINT ["poetry", "run"]
-CMD ["ash"]
+CMD ["bash"]

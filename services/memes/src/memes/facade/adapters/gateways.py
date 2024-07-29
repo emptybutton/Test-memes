@@ -19,10 +19,10 @@ class MediaGateway(gateways.media.Gateway):
         return f"{self.__media_url}/image/{image_name}"
 
     async def add_image(self, image: vos.Image) -> gateways.media.AdditionFailures | None:
-        await self.__put_image(image, for_first_time=True)
+        return await self.__put_image(image, for_first_time=True)
 
     async def update_image(self, image: vos.Image) -> gateways.media.AdditionFailures | None:
-        await self.__put_image(image, for_first_time=False)
+        return await self.__put_image(image, for_first_time=False)
 
     async def __put_image(
         self,
@@ -31,12 +31,13 @@ class MediaGateway(gateways.media.Gateway):
     ) -> gateways.media.AdditionFailures | None:
         url = self.__media_image_endpoint_url_with(image.name)
 
-        content = aiohttp.FormDataContent(image.content, filename=image.name)
-        reader = aiohttp.MultipartReader("form-data", [content])
+        data = aiohttp.FormData()
+        data.add_field("filename", image.name)
+        data.add_field("file_content", image.content)
 
         async with aiohttp.ClientSession() as session:
             method = session.post if for_first_time else session.put
-            async with method(url, data=reader, ssl=self.__ssl) as response:
+            async with method(url, data=data, ssl=self.__ssl) as response:
                 if response.status == 400:
                     return gateways.media.AdditionFailures.unsupported_image_extension
                 elif response.status != 200:

@@ -1,3 +1,5 @@
+import io
+
 from media.infrastructure.periphery.minio.clients import client
 from media.model.data.values import Bucket, File
 
@@ -11,7 +13,12 @@ async def make(bucket: Bucket) -> None:
 
 
 async def put_in(bucket: Bucket, file: File) -> None:
-    client.put_object(bucket.value, file.name, file.content)
+    client.put_object(
+        bucket.value,
+        file.name,
+        io.BytesIO(file.content),
+        len(file.content),
+    )
 
 
 async def remove_from(bucket: Bucket, name: str) -> None:

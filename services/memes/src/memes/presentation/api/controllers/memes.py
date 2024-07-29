@@ -11,7 +11,7 @@ router = APIRouter(tags=["memes"])
 
 
 @router.get("/memes/{meme_id}")
-async def read_meme(meme_id: int) -> views.success.MemeView:
+async def read_meme(meme_id: UUID) -> views.success.MemeView:
     result = await services.read_meme.perform(meme_id)
 
     if result is None:
@@ -32,7 +32,7 @@ async def read_memes(page_number: int | None = None) -> views.success.MemeListVi
 
     page_memes = [
         views.success.MemeView(meme_id=dto.meme_id, meme_text=dto.meme_text)
-        async for dto in result.page_memes
+        for dto in result.page_memes
     ]
 
     return views.success.MemeListView.of(page_memes, result.page_number)
@@ -95,6 +95,3 @@ async def delete_meme(meme_id: UUID) -> None:
         await services.delete_meme.perform(meme_id)
     except services.delete_meme.NoMemeError as error:
         raise views.failure.default_absence_view from error
-
-    except services.delete_meme.MediaIsNotWorkingError as error:
-        raise views.failure.media_is_not_working_view from error
