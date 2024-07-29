@@ -15,7 +15,7 @@ async def read_meme(meme_id: UUID) -> views.success.MemeView:
     result = await services.read_meme.perform(meme_id)
 
     if result is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND)
+        raise views.failure.default_absence_view
 
     return views.success.MemeView(
         meme_id=result.meme_id,
