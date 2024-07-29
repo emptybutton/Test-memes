@@ -13,6 +13,7 @@ alembic = "^1.13.2"
 asyncpg = "^0.29.0"
 aiohttp = "^3.9.5"
 fastapi = "^0.111.1"
+dishka = "^1.2.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.2"

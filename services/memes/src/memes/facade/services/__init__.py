@@ -4,4 +4,5 @@ from memes.facade.services import (
     read_meme as read_meme,
     read_memes as read_memes,
     update_meme as update_meme,
+    close as close,
 )

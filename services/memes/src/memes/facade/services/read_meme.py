@@ -3,7 +3,7 @@ from uuid import UUID
 
 from memes.application.cases import read_meme
 from memes.facade import adapters
-from memes.periphery.db.sessions import postgres_session_factory
+from memes.facade.di.containers import adapter_container
 
 
 @dataclass(kw_only=True, frozen=True)
@@ -13,16 +13,19 @@ class OutputDTO:
     meme_image_name: str
 
 
-async def perform(meme_id: UUID) -> OutputDTO:
-    async with postgres_session_factory() as session:
-        result = await read_meme.perform(
+async def perform(meme_id: UUID) -> OutputDTO | None:
+    async with adapter_container() as container:
+        meme = await read_meme.perform(
             meme_id,
-            transaction=adapters.transactions.DBTransaction(session),
-            memes=adapters.repos.DBMemes(session, page_size=20),
+            transaction=await container.get(adapters.transactions.DBTransaction),
+            memes=await container.get(adapters.repos.DBMemes),
         )
 
+    if meme is None:
+        return None
+
     return OutputDTO(
-        meme_id=result.meme.id,
-        meme_text=result.meme.text,
-        meme_image_name=result.image.name,
+        meme_id=meme.id,
+        meme_text=meme.text,
+        meme_image_name=meme.image_name,
     )

@@ -4,9 +4,7 @@ from typing import TypeAlias
 
 from memes.application.cases import update_meme
 from memes.facade import adapters
-from memes.periphery import loggers
-from memes.periphery.envs import Env
-from memes.periphery.db.sessions import postgres_session_factory
+from memes.facade.di.containers import adapter_container
 
 
 @dataclass(kw_only=True, frozen=True)
@@ -32,18 +30,16 @@ async def perform(
     meme_image_name: str,
     meme_image_content: bytes,
 ) -> OutputDTO:
-    gateway = adapters.gateways.MediaGateway(Env.media_host, Env.media_port, Env.media_ssl)
-
-    async with postgres_session_factory() as session:
+    async with adapter_container() as container:
         result = await update_meme.perform(
             meme_id,
             meme_text,
             meme_image_name,
             meme_image_content,
-            transaction=adapters.transactions.DBTransaction(session),
-            memes=adapters.repos.DBMemes(session, page_size=20),
-            gateway=gateway,
-            logger=adapters.loggers.Logger(loggers.main_logger),
+            transaction=await container.get(adapters.transactions.DBTransaction),
+            memes=await container.get(adapters.repos.DBMemes),
+            media_gateway=await container.get(adapters.gateways.MediaGateway),
+            logger=await container.get(adapters.loggers.Logger),
         )
 
     return OutputDTO(

@@ -4,7 +4,7 @@ from uuid import UUID
 
 from memes.application.cases import read_memes
 from memes.facade import adapters
-from memes.periphery.db.sessions import postgres_session_factory
+from memes.facade.di.containers import adapter_container
 
 
 @dataclass(kw_only=True, frozen=True)
@@ -26,11 +26,11 @@ NegativePageNumberError: TypeAlias = read_memes.NegativePageNumberError
 
 
 async def perform(page_number: int | None) -> OutputDTO:
-    async with postgres_session_factory() as session:
+    async with adapter_container() as container:
         result = await read_memes.perform(
             page_number,
-            transaction=adapters.transactions.DBTransaction(session),
-            memes=adapters.repos.DBMemes(session, page_size=20),
+            transaction=await container.get(adapters.transactions.DBTransaction),
+            memes=await container.get(adapters.repos.DBMemes),
         )
 
         page_memes = list()
